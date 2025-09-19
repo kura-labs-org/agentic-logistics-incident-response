@@ -1,0 +1,221 @@
+{
+  "name": "PepsiCo Delivery Decision Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "route-decision",
+        "options": {
+          "responseData": ""
+        }
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "efa617cb-fa73-47a3-b834-8820352595af",
+      "webhookId": "9b048191-5c1c-4c7f-91b7-50e9c0f3c0b5"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"myField\": \"value\"\n}",
+        "options": {}
+      },
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        816,
+        0
+      ],
+      "id": "0e80a6e3-5bc6-4eb6-bf67-51d1f17d9288"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a PepsiCo route decision engine agent. \n\nImportant: When making tool calls, use actual data values from the incoming webhook, not literal template strings.\n\nYour task:\n1. Use the execute_route tool available to the Logistic MCP Client to execute the chosen option\n2. Use the notify_delivery_delay tool available to the Retail Client to notify the retailer of the delay\n\nFor steps 1 and 2, construct the payload using the incoming webhook data with this structure:\n{\n  \"route_id\": \"{{ $json.body.route_id }}\",\n  \"truck_id\": \"{{ $json.body.truck_id }}\",\n  \"chosen_option\": {\n    \"option_id\": \"{{ $json.body.chosen_option.option_id }}\",\n    \"route_number\": {{ $json.body.chosen_option.route_number }},\n    \"distance_miles\": {{ $json.body.chosen_option.distance_miles }},\n    \"eta_minutes\": {{ $json.body.chosen_option.eta_minutes }}\n  }\n}\n\nDo not include sn_student_id in any tool calls.\n\n3. Use the update_execute_status tool available to the ServiceNow MCP Client to update the status to 'dispatched'\n\nFor step 3, use this payload:\n{\n    \"route_id\": \"{{ $json.body.route_id }}\",\n    \"status\": \"dispatched\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        0
+      ],
+      "id": "87fd9af0-703a-4769-afc6-47d0bc1b121c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "amazon.nova-micro-v1:0",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAwsBedrock",
+      "typeVersion": 1.1,
+      "position": [
+        144,
+        224
+      ],
+      "id": "dd39c699-232e-4035-826a-0a90bf3ae2aa",
+      "name": "AWS Bedrock Chat Model",
+      "credentials": {
+        "aws": {
+          "id": "dkpv4ibM8G9nlCvw",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://34.197.44.143:8001/mcp",
+        "serverTransport": "httpStreamable",
+        "authentication": "bearerAuth",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        224
+      ],
+      "id": "01c507c4-ce18-4925-9294-6c76a25bae56",
+      "name": "Logistics MCP Client",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "OQ4M7q6q6FhlDbj9",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://34.197.44.143:8002/mcp",
+        "serverTransport": "httpStreamable",
+        "authentication": "bearerAuth",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        224
+      ],
+      "id": "6a6dc2f1-9da0-4890-a35c-7d68643612f3",
+      "name": "Retail MCP Client",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "OQ4M7q6q6FhlDbj9",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://34.197.44.143:8000/mcp",
+        "serverTransport": "httpStreamable",
+        "authentication": "bearerAuth",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        224
+      ],
+      "id": "0155fef6-e59d-466a-b8f3-65aae96a7b2c",
+      "name": "ServiceNow MCP Client",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "OQ4M7q6q6FhlDbj9",
+          "name": "Bearer Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS Bedrock Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Logistics MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retail MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ServiceNow MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e3cc6b99-70bb-48f0-bfe7-b0ebf615282f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "93dc2ecb1e7750e8378a467acf54f6b5ac64a5916096110b1fb306605cff1ad2"
+  },
+  "id": "TtwolmEjk3cuUze5",
+  "tags": []
+}

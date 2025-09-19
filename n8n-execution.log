@@ -1,0 +1,74 @@
+logistics-mcp-client-logs-output
+[
+{
+"response": [
+{
+"type": "text",
+"text": "{\n  \"ok\": true,\n  \"message\": \"route selected\",\n  \"route_id\": \"417238\",\n  \"truck_id\": \"5849\",\n  \"chosen_option\": {\n    \"option_id\": \"opt-1\",\n    \"route_number\": 6,\n    \"distance_miles\": 181,\n    \"eta_minutes\": 186\n  },\n  \"servicenow_instance\": \"unknown\"\n}"
+}
+]
+}
+]
+
+n8n-agent-output-logs
+[
+    {
+        "output": "<thinking> The `update_execution_status` tool has successfully updated the status to 'dispatched'. All steps of the task have been completed successfully. \n\nI will now inform the user that the route execution, delivery delay notification, and status update have been successfully completed. </thinking>\n\nThe route execution, delivery delay notification, and status update have been successfully completed. Here are the details:\n- The route has been executed.\n- The retailer has been notified of the delivery delay.\n- The execution status has been updated to 'dispatched'. \n\nIf you need any further assistance, feel free to ask."
+    }
+]
+
+n8n-webhook-input-logs
+[
+    {
+        "headers": {
+            "host": "b8e27d9da70f.ngrok.app",
+            "user-agent": "ServiceNow/1.0",
+            "content-length": "133",
+            "accept": "application/json",
+            "content-type": "application/json",
+            "x-forwarded-for": "4.223.224.92",
+            "x-forwarded-host": "b8e27d9da70f.ngrok.app",
+            "x-forwarded-proto": "https",
+            "x-snc-integration-source": "d18d1433c322a650d7299dcd2b0131b1",
+            "accept-encoding": "gzip"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+            "route_id": "417238",
+            "truck_id": "5849",
+            "chosen_option": {
+                "option_id": "opt-1",
+                "route_number": 6,
+                "distance_miles": 181,
+                "eta_minutes": 186
+            }
+        },
+        "webhookUrl": "https://b8e27d9da70f.ngrok.app/webhook/route-decision",
+        "executionMode": "production"
+    }
+]
+
+retail-mcp-client-logs-output
+[
+    {
+        "response": [
+            {
+                "type": "text",
+                "text": "{\n  \"ok\": true,\n  \"notification_id\": \"73d3a792-7ee5-49f8-91c4-e21f9b4827d6\",\n  \"received_at\": \"2025-09-17T18:48:57.570098Z\",\n  \"route_id\": \"417238\",\n  \"truck_id\": \"5849\",\n  \"chosen_option\": {\n    \"option_id\": \"opt-1\",\n    \"route_number\": 6,\n    \"distance_miles\": 181,\n    \"eta_minutes\": 186\n  },\n  \"sn_student_id\": null\n}"
+            }
+        ]
+    }
+]
+
+servicenow-mcp-client-output-logs
+[
+    {
+        "response": [
+            {
+                "type": "text",
+                "text": "{\n  \"route_id\": \"417238\",\n  \"updates\": [\n    {\n      \"student_id\": \"instructor-0001\",\n      \"instance\": \"https://kura-labs-jul-4728-instructor-0001.lab.service-now.com\",\n      \"updated\": true,\n      \"status_code\": 200,\n      \"sys_id\": \"4f3fc9e18184361c7f445b4606b637ef\",\n      \"error\": null\n    }\n  ]\n}"
+            }
+        ]
+    }
+]
